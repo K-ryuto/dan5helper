@@ -54,3 +54,8 @@ compatibility_date = "2023-10-30"
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "dan5helperdb"
 database_id = "be7e30d3-3d4d-44fb-9d7b-08869753f786"
+
+[[d1_databases]]
+binding = "DB2" # i.e. available in your Worker on env.DB
+database_name = "dan5helper"
+database_id = "589c6814-c56c-46c0-8b70-a9d3d618518f"

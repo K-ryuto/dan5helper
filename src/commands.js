@@ -39,6 +39,26 @@ export const ADD_ACOUNT = {
     }
   ]
 };
+
+export const NETWORTH = {
+  name: 'networth',
+  description: 'shopの情報を出します。',
+  options: [
+    {
+      type: 3,
+      name: "token",
+      required: false,
+      description:"tokenをここに入力"
+    },
+    {
+      type: 3,
+      name: "カテゴリー",
+      required: false,
+      description:"カテゴリーをここに入力"
+    }
+  ]
+};
+
 export const INVITE_COMMAND = {
   name: 'invite',
   description: 'Get an invite link to add the bot to your server',

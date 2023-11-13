@@ -8,7 +8,7 @@ import {
   InteractionType,
   verifyKey,
 } from 'discord-interactions';
-import { ADD_ACOUNT, AWW_COMMAND, INVITE_COMMAND } from './commands.js';
+import { ADD_ACOUNT, AWW_COMMAND, INVITE_COMMAND, NETWORTH } from './commands.js';
 import { getCuteUrl } from './reddit.js';
 import { InteractionResponseFlags } from 'discord-interactions';
 
@@ -69,8 +69,20 @@ router.post('/', async (request, env) => {
       case AWW_COMMAND.name.toLowerCase(): {
         // 入力されたAPIキーをlocalStorageに保存
         // POST送信用にFormDataオブジェクトに変換
+        const player = await env.DB.prepare(
+          `SELECT * FROM players WHERE u_d_id = "${interaction.member.user.id}"`
+        ).all();
+        var key
+        if (player.results == "") {
+          key = interaction.data.options[1].value
+        } else if (interaction.data.options[1] != undefined) {
+          key = interaction.data.options[1].value
+        } else {
+          key = player.results[0].mtoken
+        }
+        console.log(key)
         const form = new FormData()
-        form.append('key', interaction.data.options[0].value)
+        form.append('key', key)
         // PHPにリクエストを投げる
         const init = {
           method: 'POST',
@@ -88,22 +100,22 @@ router.post('/', async (request, env) => {
           .catch((e) => {
             console.log(e)
           });
-        console.log(f[interaction.data.options[1].value - 0])
+        console.log(f[interaction.data.options[0].value - 0])
         const exampleEmbed = [{
           "fields": [
-            { "name": `sohp ID[${interaction.data.options[1].value - 0}]`, "value": `${f[interaction.data.options[1].value - 0].shopId}` },
-            { "name": `shop name`, "value": `${f[interaction.data.options[1].value - 0].name}` },
-            { "name": `shop type`, "value": `${f[interaction.data.options[1].value - 0].shopType}` },
-            { "name": `Item count`, "value": `${f[interaction.data.options[1].value - 0].itemCount}` },
-            { "name": `shop money`, "value": `${f[interaction.data.options[1].value - 0].money}` },
+            { "name": `sohp ID[${interaction.data.options[0].value - 0}]`, "value": `${f[interaction.data.options[0].value - 0].shopId}` },
+            { "name": `shop name`, "value": `${f[interaction.data.options[0].value - 0].name}` },
+            { "name": `shop type`, "value": `${f[interaction.data.options[0].value - 0].shopType}` },
+            { "name": `Item count`, "value": `${f[interaction.data.options[0].value - 0].itemCount}` },
+            { "name": `shop money`, "value": `${f[interaction.data.options[0].value - 0].money}` },
           ],
-          "color": (f[interaction.data.options[1].value - 0].shopType == "買取ショップ") ? 0x00FF00 : 0xFF0000,
+          "color": (f[interaction.data.options[0].value - 0].shopType == "買取ショップ") ? 0x00FF00 : 0xFF0000,
         }];
         return new JsonResponse({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
             embeds: exampleEmbed,
-            // flags: InteractionResponseFlags.EPHEMERAL,
+            flags: InteractionResponseFlags.EPHEMERAL,
           }
         });
       }
@@ -133,7 +145,7 @@ router.post('/', async (request, env) => {
             const data = await fetch(`https://api.mojang.com/users/profiles/minecraft/${interaction.data.options[0].value}`)
               .then((response) => response.json())
             await env.DB.prepare(
-              `INSERT INTO players VALUES (1,"${interaction.data.options[0].value}","${data.id}","${interaction.member.user.id}","${Date.now()}",0,"none","none",0)`
+              `INSERT INTO players VALUES (1,"${interaction.data.options[0].value}","${data.id}","${interaction.member.user.id}","${Date.now()}",0,"none","none",0,"${interaction.data.options[1].value}")`
             ).all()
           }
         } catch (error) {
@@ -145,6 +157,58 @@ router.post('/', async (request, env) => {
             content: "success !",
             flags: InteractionResponseFlags.EPHEMERAL,
           },
+        });
+      }
+      case NETWORTH.name.toLowerCase(): {
+        const player = await env.DB.prepare(
+          `SELECT * FROM players WHERE u_d_id = "${interaction.member.user.id}"`
+        ).all();
+        var key
+        if (player.results == "") {
+          key = interaction.data.options[0].value
+        } else if (interaction.data.options != undefined) {
+          key = interaction.data.options[0].value
+        } else {
+          key = player.results[0].mtoken
+        }
+        console.log(key)
+        const form = new FormData()
+        form.append('key', key)
+        // PHPにリクエストを投げる
+        const init = {
+          method: 'POST',
+          body: form
+        };
+
+        const f = await fetch('https://man10test.cloudfree.jp/shop.php', init)
+          .then((response) => {
+            return response.json(); // or .text() or .blob() ...
+          })
+          .then((text) => {
+            return text
+            // text is the response body
+          })
+          .catch((e) => {
+            console.log(e)
+          });
+          var moneys = 0
+          for(var i in f){
+            moneys += f[i].money-0
+            console.log(f[i].money)
+          }
+          console.log(moneys)
+        const exampleEmbed = [{
+          "fields": [
+            { "name": `shop value:`,"value":`${f.length}` },
+            { "name": `shop moneys:`,"value":`${moneys.toLocaleString()}` },
+          ]
+        }];
+        return new JsonResponse({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            embeds: exampleEmbed,
+            flags: InteractionResponseFlags.EPHEMERAL,
+          }
         });
       }
       default:
