@@ -2,6 +2,7 @@
   "name": "dan5helper",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -9,5 +10,10 @@
   },
   "devDependencies": {
     "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "discord-interactions": "^3.4.0",
+    "dotenv": "^16.3.1",
+    "itty-router": "^4.0.23"
   }
 }

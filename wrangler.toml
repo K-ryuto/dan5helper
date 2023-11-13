@@ -49,3 +49,8 @@ compatibility_date = "2023-10-30"
 # [[migrations]]
 # tag = "v1"
 # new_classes = ["MyDurableObject"]
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "dan5helperdb"
+database_id = "be7e30d3-3d4d-44fb-9d7b-08869753f786"
