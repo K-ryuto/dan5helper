@@ -120,7 +120,7 @@ router.post('/', async (request, env) => {
         });
       }
       case INVITE_COMMAND.name.toLowerCase(): {
-        const applicationId = "1173135045339398204";
+        const applicationId = "";
         const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${applicationId}&scope=applications.commands`;
         return new JsonResponse({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
